@@ -64,7 +64,7 @@ class GeoLocationModel(HashableModel):
     ContinentCode: Optional[str] = Field(
         default=None,
         description="Continent code of the location",
-        example="AN")
+        example=ContinentCodeEnum.Antarctica)
     CountryCode: Optional[str] = Field(
         default=None,
         description="Country code or '*' for default or fallback",
@@ -99,14 +99,28 @@ class R53Record(HashableModel):
     AliasTarget: Optional[AliasTargetModel]
     ResourceRecords: Optional[List[ResourceRecord]]
     SetIdentifier: Optional[str] = Field(
-        None,
+        default=None,
         description="Assigns an arbitrary identifier to the record",
         example="rp-geo-default")
     Weight: Optional[int] = Field(
-        None,
+        default=None,
         description="If the record has weighted routing policy, this field will"
                     " indicate the weight of the record.",
         example=100)
+    Failover: Optional[str] = Field(
+        default=None,
+        description="Can be either PRIMARY or SECONDARY",
+        example="PRIMARY")
+    MultiValueAnswer: Optional[bool] = Field(
+        default=None,
+        example=False)
+    HealthCheckId: Optional[str] = Field(
+        default=None,
+        description="Unique identifier of the associated health check",
+        example="ff59b681-c8b6-4039-98ed-0e5b77edc1ac")
+    TrafficPolicyInstanceId: Optional[str] = Field(
+        default=None,
+        example="ff59b681-c8b6-4039-98ed-0e5b77edc1ad")
 
     @staticmethod
     def from_dict(record_dict: dict) -> "R53Record":
