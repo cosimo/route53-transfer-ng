@@ -1,0 +1,7 @@
+- Name: geo4.example.com.
+  Type: A
+  GeoLocation:
+    ContinentCode: EU
+  SetIdentifier: rp-geo-europe
+  ResourceRecords:
+    - Value: 127.0.0.5
