@@ -4,8 +4,9 @@
 route53-transfer-ng
 
 Usage:
-  route53-transfer-ng [options] load <zone> <file>
   route53-transfer-ng [options] dump <zone> <file>
+  route53-transfer-ng [options] load <zone> <file>
+  route53-transfer-ng zones
   route53-transfer-ng -h | --help
   route53-transfer-ng -v | --version
 

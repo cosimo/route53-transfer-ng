@@ -19,6 +19,11 @@ wouldn't easily allow support for all the Route53 routing policies and features.
 
 ## Usage
 
+List all the hosted zones in the current AWS account (use the `AWS_PROFILE`
+environment variable to control which account is active):
+
+    route53-transfer-ng zones
+
 Backup the `example.com` zone to a YAML file:
 
     route53-transfer-ng dump --format yaml example.com example.com.yaml

@@ -383,6 +383,24 @@ def dump(r53_client, zone_name, output_file, **kwargs):
     output_file.flush()
 
 
+def zones(r53_client):
+    """
+    List all Route53 zones in the current account
+    """
+    paginator = r53_client.get_paginator('list_hosted_zones')
+
+    for hosted_zones_page in paginator.paginate():
+        hosted_zones = hosted_zones_page.get("HostedZones", [])
+
+        for zone in hosted_zones:
+            zone_id = zone["Id"].replace("/hostedzone/", "")
+            zone_name = zone["Name"]
+            is_private = zone["Config"]["PrivateZone"]
+            comment = zone["Config"].get("Comment", "")
+
+            print("\t".join((zone_id, zone_name, str(is_private), comment)))
+
+
 def run(params):
     r53_client = boto3.client('route53')
     zone_name = params['<zone>']
@@ -401,6 +419,10 @@ def run(params):
         vpc['is_private'] = False
 
     if params.get('dump'):
+        # Make it possible to directly use the output of the `zones` command
+        if zone_name.endswith('.'):
+            zone_name = zone_name[:-1]
+
         dump(r53_client, zone_name, get_file(filename, 'w'),
              format=format, vpc=vpc)
 
@@ -410,5 +432,9 @@ def run(params):
 
         load(r53_client, zone_name, get_file(filename, 'r'), vpc=vpc,
              format=format, dry_run=dry_run, use_upsert=use_upsert)
+
+    elif params.get('zones'):
+        zones(r53_client)
+
     else:
         return 1
