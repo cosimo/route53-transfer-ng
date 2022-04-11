@@ -215,7 +215,7 @@ def load(r53, zone_name, file_in, **kwargs):
             for change in update_batch.changes:
                 print("    -", change['operation'], change['record'])
         else:
-            print("update_batch.commit(r53, zone)")
+            update_batch.commit(r53, zone)
         n += 1
 
     else:

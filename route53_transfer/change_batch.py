@@ -29,7 +29,7 @@ class ChangeBatch:
 
         try:
             changes_list = list(map(change_to_rrset, self.changes))
-            print("changes_list:", changes_list)
+            # print("changes_list:", changes_list)
 
             response = r53.change_resource_record_sets(
                 HostedZoneId=zone['id'],
@@ -37,8 +37,27 @@ class ChangeBatch:
                     'Comment': 'route53-transfer load operation',
                     'Changes': changes_list,
                 })
-            print(response)
-            return True
+
+            # Example of response:
+            #
+            # {'ResponseMetadata':
+            #    {'RequestId': 'a4138a44-f95c-4458-b8f3-38d349cc2f6c',
+            #     'HTTPStatusCode': 200,
+            #     'HTTPHeaders': {'x-amzn-requestid': 'a4138a44-f95c-4458-b8f3-38d349cc2f6c',
+            #                     'content-type': 'text/xml',
+            #                     'content-length': '332',
+            #                     'date': 'Mon, 11 Apr 2022 10:06:49 GMT'},
+            #     'RetryAttempts': 0},
+            #  'ChangeInfo':
+            #    {'Id': '/change/C0258959QK8IOL6B7RLY',
+            #     'Status': 'PENDING',
+            #     'SubmittedAt': datetime.datetime(2022, 4, 11, 10, 6, 49, 714000, tzinfo=tzutc()),
+            #     'Comment': 'route53-transfer load operation'}
+            #  }
+
+            is_success = 200 == int(response.get('ResponseMetadata', {}).get('HTTPStatusCode', 0))
+            return is_success
+
         # TODO : catch specific exceptions
         except Exception as error:
             print("Exception :" + str(error))
