@@ -37,7 +37,7 @@ def test_equality_of_record_copy():
                        ResourceRecord(Value="127.0.0.1")
                    ])
 
-    r2 = r1.copy()
+    r2 = r1.model_copy()
 
     assert r1 == r2
     assert r1.__hash__() == r2.__hash__()
@@ -45,7 +45,7 @@ def test_equality_of_record_copy():
 
 def test_inequality_of_record_copy():
     """
-    `model.copy()` is a shallow copy! Be careful how you treat models that have
+    `model.model_copy()` is a shallow copy! Be careful how you treat models that have
     been copied! Modifying object members like `ResourceRecords` is likely to
     cause surprising results.
     """
@@ -56,7 +56,7 @@ def test_inequality_of_record_copy():
                        ResourceRecord(Value="127.0.0.1")
                    ])
 
-    r2 = r1.copy()
+    r2 = r1.model_copy()
 
     # WARNING: Modifying the copied model like the following is going to modify
     # the source object as well, thus producing equal hashes, so don't do it!
@@ -116,7 +116,7 @@ def test_inequality_of_type_value():
                        ResourceRecord(Value="127.0.0.1")
                    ])
 
-    r2 = r1.copy()
+    r2 = r1.model_copy()
     r2.Type = "AAAA"
 
     assert r1 != r2, \

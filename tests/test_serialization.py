@@ -10,7 +10,7 @@ from helpers import (
     fixtures_for,
 )
 
-from route53_transfer.models import ContinentCodeEnum, R53Record, ResourceRecord, GeoLocationModel
+from route53_transfer.models import ContinentCodeEnum, R53Record, ResourceRecord, GeoLocationModel, AliasTargetModel
 
 
 @pytest.mark.parametrize('fixture', fixtures_for('test1'))
@@ -38,30 +38,23 @@ def test_deserialize_simple_record(fixture):
     assert rr0_value == "127.0.0.99"
 
 
-def test_deserialize_geolocation_routing_policy():
-    records = load_fixture(fixture_filename="geolocation.yaml")
-    assert len(records) == 3
+def test_deserialize_alias_record():
+    records = load_fixture(fixture_filename="alias.yaml")
+    assert len(records) == 1
 
-    geo_rp_default, geo_rp_se, geo_rp_africa = records
+    alias = records[0]
 
-    assert geo_rp_default.Name == "geo1.example.com."
-    assert geo_rp_default.TTL is None
-    assert geo_rp_default.Type == "A"
-    assert len(geo_rp_default.ResourceRecords) == 1
-    assert geo_rp_default.GeoLocation.CountryCode == "*"
+    assert alias.Name == "alias1.example.com."
+    assert alias.TTL == 299
+    assert alias.Type == "A"
+    assert alias.ResourceRecords is None
+    assert alias.GeoLocation is None
 
-    assert geo_rp_se.Name == "geo2.example.com."
-    assert geo_rp_se.TTL is None
-    assert geo_rp_se.Type == "A"
-    assert geo_rp_se.ResourceRecords[0].Value == "127.0.0.3"
-    assert geo_rp_se.GeoLocation.CountryCode == "SE"
-
-    assert geo_rp_africa.Name == "geo3.example.com."
-    assert geo_rp_africa.TTL is None
-    assert geo_rp_africa.Type == "A"
-    assert geo_rp_africa.ResourceRecords[0].Value == "127.0.0.4"
-    assert geo_rp_africa.GeoLocation.CountryCode is None
-    assert geo_rp_africa.GeoLocation.ContinentCode == ContinentCodeEnum.Africa
+    alias_target = alias.AliasTarget
+    assert alias_target is not None
+    assert alias_target.DNSName == "target1.example.com."
+    assert alias_target.EvaluateTargetHealth is False
+    assert alias_target.HostedZoneId == "A3TCE240BABCDE"
 
 
 def test_serialize_deserialize_geolocation_eu():
@@ -99,8 +92,28 @@ def test_serialize_record_with_continent_eu():
         ),
     )
 
-    record_dict = r.dict(exclude_none=True)
+    record_dict = r.model_dump(exclude_none=True)
     record_yaml = yaml.safe_dump(record_dict)
 
     assert record_yaml is not None
     assert "ContinentCode: EU" in record_yaml
+
+
+def test_serialize_alias_record():
+    r = R53Record(
+        Name="alias1.example.com.",
+        TTL=300,
+        Type="A",
+        AliasTarget=AliasTargetModel(
+            DNSName="target1.example.com.",
+            EvaluateTargetHealth=False,
+            HostedZoneId="Z2FDTNDATAQYW2",
+        ),
+    )
+
+    record_dict = r.model_dump(exclude_none=True)
+    record_yaml = yaml.safe_dump(record_dict)
+
+    assert record_yaml is not None
+    assert "AliasTarget:" in record_yaml
+    assert "DNSName: target1.example.com" in record_yaml

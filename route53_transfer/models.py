@@ -12,15 +12,18 @@ class AliasTargetModel(HashableModel):
     DNSName: str = Field(
         None,
         description="DNS name of the target host",
-        example="test1.example.com.")
+        examples=["test1.example.com."],
+    )
     EvaluateTargetHealth: bool = Field(
         None,
         description="Whether or not to evaluate the health of the target",
-        example=False)
+        examples=[False, True],
+    )
     HostedZoneId: str = Field(
         None,
         description="Hosted zone ID of the target host",
-        example="Z0992A3F3Q3HY06FU")
+        examples=["Z0992A3F3Q3HY06FU"],
+    )
 
 
 class ResourceRecord(HashableModel):
@@ -28,7 +31,8 @@ class ResourceRecord(HashableModel):
     Value: str = Field(
         None,
         description="Value of the resource record",
-        example="test1.example.com.")
+        examples=["test1.example.com."],
+    )
 
 
 class RegionEnum(str, Enum):
@@ -64,15 +68,18 @@ class GeoLocationModel(HashableModel):
     ContinentCode: Optional[str] = Field(
         default=None,
         description="Continent code of the location",
-        example=ContinentCodeEnum.Antarctica)
+        examples=[ContinentCodeEnum.Antarctica],
+    )
     CountryCode: Optional[str] = Field(
         default=None,
         description="Country code or '*' for default or fallback",
-        example="US")
+        examples=["US"],
+    )
     SubdivisionCode: Optional[str] = Field(
         default=None,
         description="Subdivision code of the location",
-        example="CA")
+        examples=["CA"],
+    )
 
 
 class R53Record(HashableModel):
@@ -80,47 +87,57 @@ class R53Record(HashableModel):
     Name: str = Field(
         None,
         description="Name of the DNS record",
-        example="test1.example.com.")
+        examples=["test1.example.com."],
+    )
     Type: str = Field(
         None,
         description="Type of DNS record",
-        example="A")
+        examples=["A"],
+    )
     TTL: int = Field(
         None,
         description="Time to leave of the DNS record in seconds",
-        example=300)
+        examples=[60, 300],
+    )
     Region: Optional[str] = Field(
         None,
         description="If the record has latency routing policy, this field will"
                     " indicate which AWS region is the record pointing to."
                     " Must be a valid AWS region name",
-        example="eu-west-1")
-    GeoLocation: Optional[GeoLocationModel]
-    AliasTarget: Optional[AliasTargetModel]
-    ResourceRecords: Optional[List[ResourceRecord]]
+        examples=["eu-west-1", "us-east-2"],
+    )
+    GeoLocation: Optional[GeoLocationModel] = None
+    AliasTarget: Optional[AliasTargetModel] = None
+    ResourceRecords: Optional[List[ResourceRecord]] = None
     SetIdentifier: Optional[str] = Field(
         default=None,
         description="Assigns an arbitrary identifier to the record",
-        example="rp-geo-default")
+        examples=["rp-geo-default", "europe-main"],
+    )
     Weight: Optional[int] = Field(
         default=None,
         description="If the record has weighted routing policy, this field will"
                     " indicate the weight of the record.",
-        example=100)
+        examples=[0, 100],
+    )
     Failover: Optional[str] = Field(
         default=None,
         description="Can be either PRIMARY or SECONDARY",
-        example="PRIMARY")
+        examples=["PRIMARY", "SECONDARY"],
+    )
     MultiValueAnswer: Optional[bool] = Field(
         default=None,
-        example=False)
+        examples=[False, True],
+    )
     HealthCheckId: Optional[str] = Field(
         default=None,
         description="Unique identifier of the associated health check",
-        example="ff59b681-c8b6-4039-98ed-0e5b77edc1ac")
+        examples=["ff59b681-c8b6-4039-98ed-0e5b77edc1ac"],
+    )
     TrafficPolicyInstanceId: Optional[str] = Field(
         default=None,
-        example="ff59b681-c8b6-4039-98ed-0e5b77edc1ad")
+        examples=["ff59b681-c8b6-4039-98ed-0e5b77edc1ac"],
+    )
 
     @staticmethod
     def from_dict(record_dict: dict) -> "R53Record":

@@ -33,6 +33,6 @@ def write_records(records: List[R53Record], format='yaml') -> str:
     default_writer = FORMAT_WRITER[DEFAULT_FORMAT]
     writer = FORMAT_WRITER.get(format, default_writer)
 
-    records_dict_list = [record.dict(exclude_none=True)
+    records_dict_list = [record.model_dump(exclude_none=True)
                          for record in records]
     return writer(records_dict_list)
