@@ -16,7 +16,7 @@ from helpers import (
     diff_zone_upsert)
 
 
-TEST_ZONE_ID = 1
+TEST_ZONE_ID = "ABCDEFG123456"
 TEST_ZONE_NAME = "test.dev"
 TEST_ZONE = {"id": TEST_ZONE_ID, "name": TEST_ZONE_NAME}
 
