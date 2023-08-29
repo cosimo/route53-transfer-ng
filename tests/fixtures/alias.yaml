@@ -1,0 +1,7 @@
+- Name: alias1.example.com.
+  Type: A
+  TTL: 299
+  AliasTarget:
+    DNSName: target1.example.com.
+    EvaluateTargetHealth: false
+    HostedZoneId: A3TCE240BABCDE
