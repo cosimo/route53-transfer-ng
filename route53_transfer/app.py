@@ -16,6 +16,7 @@ import boto3
 from route53_transfer.models import R53Record
 from route53_transfer.serialization import read_records, write_records
 from route53_transfer.change_batch import ChangeBatch
+from route53_transfer.formatter import RecordFormatter
 
 
 def exit_with_error(error):
@@ -206,13 +207,15 @@ def load(r53, zone_name, file_in, **kwargs):
     else:
         print("Applying changes...")
 
+    formatter = RecordFormatter()
     n = 1
     for update_batch in changes_to_r53_updates(zone, changes):
 
-        print(f"* Update batch {n} ({len(update_batch.changes)} changes)")
+        summary = formatter.get_batch_summary(update_batch.changes)
+        print(f"* Update batch {n} ({summary})")
         if dry_run:
-            for change in update_batch.changes:
-                print("    -", change['operation'], change['record'])
+            formatted_output = formatter.format_batch(update_batch.changes)
+            print(formatted_output)
         else:
             update_batch.commit(r53, zone)
         n += 1
@@ -348,15 +351,35 @@ def compute_changes(zone, existing_records, desired_records, use_upsert=False):
     if to_add or to_delete:
         for record in sort_by_name(to_add):
             op_type = "UPSERT" if use_upsert and is_in_set(record, to_delete) else "CREATE"
-            changes.append({"zone": zone,
-                            "operation": op_type,
-                            "record": record})
+
+            # For UPSERT, find the old record (matched by Name/Type/SetIdentifier) to show a diff
+            old_record = None
+            if op_type == "UPSERT":
+                old_record = next(
+                    (
+                        old
+                        for old in to_delete
+                        if (old.Name, old.Type, old.SetIdentifier)
+                        == (record.Name, record.Type, record.SetIdentifier)
+                    ),
+                    None,
+                )
+
+            changes.append(
+                {
+                    "zone": zone,
+                    "operation": op_type,
+                    "record": record,
+                    "old_record": old_record,
+                }
+            )
 
         for record in sort_by_name(to_delete):
             if not (use_upsert and is_in_set(record, to_add)):
                 changes.insert(0, {"zone": zone,
                                    "operation": "DELETE",
-                                   "record": record})
+                                   "record": record,
+                                   "old_record": None})
 
     return changes
 
