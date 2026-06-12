@@ -21,7 +21,7 @@ setup(name='route53-transfer-ng',
       scripts=['bin/route53-transfer-ng'],
       tests_require=open('test-requirements.txt').readlines(),
       install_requires=open('requirements.txt').readlines(),
-      python_requires='>=3.6',
+      python_requires='>=3.9',
       classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',

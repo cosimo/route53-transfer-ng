@@ -153,5 +153,5 @@ class R53Record(HashableModel):
         return self.AliasTarget.DNSName if self.is_alias() else None
 
     def __str__(self):
-        dict_ = self.dict(exclude_none=True)
+        dict_ = self.model_dump(exclude_none=True)
         return str(dict_)
