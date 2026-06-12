@@ -23,7 +23,7 @@ class ChangeBatch:
         Commit the current ChangeBatch to Route53 in a single transaction
         """
         def change_to_rrset(change):
-            rrset_dict = change["record"].dict(exclude_none=True)
+            rrset_dict = change["record"].model_dump(exclude_none=True)
             return {"Action": change["operation"],
                     "ResourceRecordSet": {**rrset_dict}}
 

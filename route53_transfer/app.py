@@ -9,7 +9,6 @@ from collections import defaultdict
 
 import sys
 import time
-from datetime import datetime
 from os import environ
 
 import boto3
@@ -114,7 +113,7 @@ def get_zone(r53_client, zone_name, vpc):
 
 
 def create_zone(r53_client, zone_name, vpc):
-    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", datetime.utcnow().utctimetuple())
+    ts = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     r53_client.create_hosted_zone(
         Name=zone_name,
         VPC={
