@@ -4,10 +4,10 @@ Unit tests for the RecordFormatter class
 
 from route53_transfer.formatter import RecordFormatter
 from route53_transfer.models import (
+    AliasTargetModel,
+    GeoLocationModel,
     R53Record,
     ResourceRecord,
-    AliasTargetModel,
-    GeoLocationModel
 )
 
 
@@ -21,9 +21,7 @@ def test_batch_summary_empty():
 def test_batch_summary_single_change():
     """Test batch summary with single change."""
     formatter = RecordFormatter(use_color=False)
-    changes = [
-        {"operation": "CREATE", "record": None, "old_record": None}
-    ]
+    changes = [{"operation": "CREATE", "record": None, "old_record": None}]
     summary = formatter.get_batch_summary(changes)
     assert summary == "1 change"
 
@@ -52,16 +50,10 @@ def test_format_simple_a_record_create():
         Name="test.example.com.",
         Type="A",
         TTL=300,
-        ResourceRecords=[
-            ResourceRecord(Value="192.0.2.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.1")],
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -81,16 +73,10 @@ def test_format_delete_operation():
         Name="old.example.com.",
         Type="A",
         TTL=600,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
-    change = {
-        "operation": "DELETE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "DELETE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -109,15 +95,11 @@ def test_format_mx_record_with_multiple_values():
         TTL=3600,
         ResourceRecords=[
             ResourceRecord(Value="10 mail1.example.com."),
-            ResourceRecord(Value="20 mail2.example.com.")
-        ]
+            ResourceRecord(Value="20 mail2.example.com."),
+        ],
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -136,15 +118,11 @@ def test_format_alias_record():
         AliasTarget=AliasTargetModel(
             DNSName="target.example.com.",
             HostedZoneId="Z1234567890ABC",
-            EvaluateTargetHealth=False
-        )
+            EvaluateTargetHealth=False,
+        ),
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -164,16 +142,10 @@ def test_format_weighted_routing_policy():
         TTL=300,
         SetIdentifier="weight-1",
         Weight=70,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -192,16 +164,10 @@ def test_format_geolocation_routing_policy():
         TTL=300,
         SetIdentifier="geo-sweden",
         GeoLocation=GeoLocationModel(CountryCode="SE"),
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -220,16 +186,10 @@ def test_format_failover_routing_policy():
         TTL=60,
         SetIdentifier="primary",
         Failover="PRIMARY",
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -247,16 +207,10 @@ def test_format_latency_routing_policy():
         TTL=300,
         SetIdentifier="us-east-1",
         Region="us-east-1",
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
-    change = {
-        "operation": "CREATE",
-        "record": record,
-        "old_record": None
-    }
+    change = {"operation": "CREATE", "record": record, "old_record": None}
 
     output = formatter.format_change(change)
 
@@ -272,25 +226,17 @@ def test_upsert_with_ttl_change():
         Name="test.example.com.",
         Type="A",
         TTL=300,
-        ResourceRecords=[
-            ResourceRecord(Value="192.0.2.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.1")],
     )
 
     new_record = R53Record(
         Name="test.example.com.",
         Type="A",
         TTL=600,
-        ResourceRecords=[
-            ResourceRecord(Value="192.0.2.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.1")],
     )
 
-    change = {
-        "operation": "UPSERT",
-        "record": new_record,
-        "old_record": old_record
-    }
+    change = {"operation": "UPSERT", "record": new_record, "old_record": old_record}
 
     output = formatter.format_change(change)
 
@@ -309,8 +255,8 @@ def test_upsert_with_value_changes():
         TTL=300,
         ResourceRecords=[
             ResourceRecord(Value="10.0.0.1"),
-            ResourceRecord(Value="10.0.0.2")
-        ]
+            ResourceRecord(Value="10.0.0.2"),
+        ],
     )
 
     new_record = R53Record(
@@ -319,15 +265,11 @@ def test_upsert_with_value_changes():
         TTL=300,
         ResourceRecords=[
             ResourceRecord(Value="10.0.0.2"),
-            ResourceRecord(Value="10.0.0.3")
-        ]
+            ResourceRecord(Value="10.0.0.3"),
+        ],
     )
 
-    change = {
-        "operation": "UPSERT",
-        "record": new_record,
-        "old_record": old_record
-    }
+    change = {"operation": "UPSERT", "record": new_record, "old_record": old_record}
 
     output = formatter.format_change(change)
 
@@ -346,9 +288,7 @@ def test_upsert_with_weight_change():
         TTL=300,
         SetIdentifier="weight-1",
         Weight=70,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
     new_record = R53Record(
@@ -357,16 +297,10 @@ def test_upsert_with_weight_change():
         TTL=300,
         SetIdentifier="weight-1",
         Weight=80,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
-    change = {
-        "operation": "UPSERT",
-        "record": new_record,
-        "old_record": old_record
-    }
+    change = {"operation": "UPSERT", "record": new_record, "old_record": old_record}
 
     output = formatter.format_change(change)
 
@@ -384,8 +318,8 @@ def test_upsert_with_alias_target_change():
         AliasTarget=AliasTargetModel(
             DNSName="target1.example.com.",
             HostedZoneId="Z1111111111111",
-            EvaluateTargetHealth=False
-        )
+            EvaluateTargetHealth=False,
+        ),
     )
 
     new_record = R53Record(
@@ -394,15 +328,11 @@ def test_upsert_with_alias_target_change():
         AliasTarget=AliasTargetModel(
             DNSName="target2.example.com.",
             HostedZoneId="Z2222222222222",
-            EvaluateTargetHealth=False
-        )
+            EvaluateTargetHealth=False,
+        ),
     )
 
-    change = {
-        "operation": "UPSERT",
-        "record": new_record,
-        "old_record": old_record
-    }
+    change = {"operation": "UPSERT", "record": new_record, "old_record": old_record}
 
     output = formatter.format_change(change)
 
@@ -421,34 +351,38 @@ def test_format_batch_with_mixed_operations():
         Name="new.example.com.",
         Type="A",
         TTL=300,
-        ResourceRecords=[ResourceRecord(Value="192.0.2.1")]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.1")],
     )
 
     delete_record = R53Record(
         Name="old.example.com.",
         Type="A",
         TTL=300,
-        ResourceRecords=[ResourceRecord(Value="192.0.2.2")]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.2")],
     )
 
     old_upsert_record = R53Record(
         Name="update.example.com.",
         Type="A",
         TTL=300,
-        ResourceRecords=[ResourceRecord(Value="192.0.2.3")]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.3")],
     )
 
     new_upsert_record = R53Record(
         Name="update.example.com.",
         Type="A",
         TTL=600,
-        ResourceRecords=[ResourceRecord(Value="192.0.2.3")]
+        ResourceRecords=[ResourceRecord(Value="192.0.2.3")],
     )
 
     changes = [
         {"operation": "CREATE", "record": create_record, "old_record": None},
         {"operation": "DELETE", "record": delete_record, "old_record": None},
-        {"operation": "UPSERT", "record": new_upsert_record, "old_record": old_upsert_record},
+        {
+            "operation": "UPSERT",
+            "record": new_upsert_record,
+            "old_record": old_upsert_record,
+        },
     ]
 
     output = formatter.format_batch(changes)
@@ -472,8 +406,8 @@ def test_upsert_multiple_records_same_name_different_types():
         TTL=60,
         ResourceRecords=[
             ResourceRecord(Value="10 mail1.example.com."),
-            ResourceRecord(Value="20 mail2.example.com.")
-        ]
+            ResourceRecord(Value="20 mail2.example.com."),
+        ],
     )
 
     # New MX record
@@ -483,8 +417,8 @@ def test_upsert_multiple_records_same_name_different_types():
         TTL=60,
         ResourceRecords=[
             ResourceRecord(Value="10 mail1.example.com."),
-            ResourceRecord(Value="20 mail3.example.com.")
-        ]
+            ResourceRecord(Value="20 mail3.example.com."),
+        ],
     )
 
     # Old TXT record
@@ -494,7 +428,7 @@ def test_upsert_multiple_records_same_name_different_types():
         TTL=60,
         ResourceRecords=[
             ResourceRecord(Value='"v=spf1 include:_spf.example.com ~all"')
-        ]
+        ],
     )
 
     # New TXT record
@@ -504,20 +438,20 @@ def test_upsert_multiple_records_same_name_different_types():
         TTL=60,
         ResourceRecords=[
             ResourceRecord(Value='"v=spf1 include:_spf.example.com -all"')
-        ]
+        ],
     )
 
     # Create changes for both records
     mx_change = {
         "operation": "UPSERT",
         "record": new_mx_record,
-        "old_record": old_mx_record
+        "old_record": old_mx_record,
     }
 
     txt_change = {
         "operation": "UPSERT",
         "record": new_txt_record,
-        "old_record": old_txt_record
+        "old_record": old_txt_record,
     }
 
     # Format MX change
@@ -550,9 +484,7 @@ def test_upsert_multiple_records_same_name_and_type_different_set_identifiers():
         TTL=300,
         SetIdentifier="weight-1",
         Weight=70,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
     # New weighted A record - weight-1 (updated weight)
@@ -562,9 +494,7 @@ def test_upsert_multiple_records_same_name_and_type_different_set_identifiers():
         TTL=300,
         SetIdentifier="weight-1",
         Weight=80,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.1")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.1")],
     )
 
     # Old weighted A record - weight-2
@@ -574,9 +504,7 @@ def test_upsert_multiple_records_same_name_and_type_different_set_identifiers():
         TTL=300,
         SetIdentifier="weight-2",
         Weight=30,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.2")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.2")],
     )
 
     # New weighted A record - weight-2 (updated IP)
@@ -586,22 +514,20 @@ def test_upsert_multiple_records_same_name_and_type_different_set_identifiers():
         TTL=300,
         SetIdentifier="weight-2",
         Weight=30,
-        ResourceRecords=[
-            ResourceRecord(Value="10.0.0.3")
-        ]
+        ResourceRecords=[ResourceRecord(Value="10.0.0.3")],
     )
 
     # Create changes for both weighted records
     weight1_change = {
         "operation": "UPSERT",
         "record": new_weight1_record,
-        "old_record": old_weight1_record
+        "old_record": old_weight1_record,
     }
 
     weight2_change = {
         "operation": "UPSERT",
         "record": new_weight2_record,
-        "old_record": old_weight2_record
+        "old_record": old_weight2_record,
     }
 
     # Format weight-1 change
